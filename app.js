@@ -5,9 +5,10 @@ var express = require('express'),
     dust = require('dustjs-helpers'),
     pg = require('pg'),
     app = express();
+var pool = new pg.Pool()
 
 //DB Connect string
-var connect = "postgres://milind:12345@localhost/database";
+var connect = "postgres://milind:12345@localhost/recipebookdb";
 
 //Assign dust engine to .dust files
 app.engine('dust', cons.dust);
@@ -24,8 +25,22 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/', function(req, res){
-    res.render('index');
-})
+   //PG connect
+   pg.connect(connect, function(err,client, done){
+       if(err){
+           return console.error('error fetching client from pool', err);
+       }
+       client.query('SELECT * FROM recipe', function(err, result){
+           if(err){
+               return console.error('error running query', err);
+           }
+           console.log(result.rows)
+           res.render('index', {recipes: result.rows});// it is used for dust files
+           done();
+       });
+   });
+});
+pool.end()
 
 //server
 app.listen(3000, function(){

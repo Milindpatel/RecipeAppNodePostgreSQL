@@ -1,5 +1,14 @@
 {>"layout" /}
 
 {<body}
-    This is index
+   {#recipes}
+    <div class="well">
+        <h4>{title}<button class="btn btn-default pull-right" data-toggle="collapse" href="#recipe_{id}" aria-expanded="recipe_{id}" aria-controls="collapseExample"">View</button>
+        </h4>
+
+        <div class="collapse" id="recipe_{id}">
+            TEST
+        </div>
+    </div>
+   {/recipes}
 {/body}
