@@ -1,0 +1,29 @@
+{
+  "name": "recipebook",
+  "version": "1.0.0",
+  "description": "Recipe Manager",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Milindpatel/RecipeAppNodePostgreSQL.git"
+  },
+  "author": "Milind patel Test",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Milindpatel/RecipeAppNodePostgreSQL/issues"
+  },
+  "homepage": "https://github.com/Milindpatel/RecipeAppNodePostgreSQL#readme",
+  "dependencies": {
+    "body-parser": "*",
+    "consolidate": "*",
+    "dust": "*",
+    "dustjs-helpers": "*",
+    "dustjs-linkedin": "*",
+    "express": "*",
+    "pg": "*"
+  }
+
+}
