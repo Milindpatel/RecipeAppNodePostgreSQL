@@ -3,11 +3,28 @@
 {<body}
    {#recipes}
     <div class="well">
-        <h4>{title}<button class="btn btn-default pull-right" data-toggle="collapse" href="#recipe_{id}" aria-expanded="recipe_{id}" aria-controls="collapseExample"">View</button>
+        <h4>
+        {title}
+        <button class="btn btn-default pull-right" data-toggle="collapse" href="#recipe_{id}" aria-expanded="recipe_{id}" aria-controls="collapseExample"">
+            <span class = "glyphicon glyphicon-triangle-bottom" aria-hidden = "true"></span>
+        </button>
         </h4>
 
         <div class="collapse" id="recipe_{id}">
-            TEST
+           <br/>
+           <br/>
+           <p><strong>Ingredients: </strong>{ingredients}</p>
+           <p><strong>Directions: </strong>{directions}</p>
+           <br />
+           <hr/>
+           <button class="btn btn-default edit-recipe">
+                <span class="glyphicon glyphicon-edit" aria-hidden="true">
+                </sapn>
+           </button>
+            <button class="btn btn-danger delete-recipe">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true">
+                </sapn>
+           </button>
         </div>
     </div>
    {/recipes}
