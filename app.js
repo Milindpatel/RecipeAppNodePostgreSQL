@@ -24,6 +24,8 @@ app.use(express.static(path.join(__dirname,'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+
+//*******USE npm install pg@6************** 
 app.get('/', function(req, res){
    //PG connect
    pg.connect(connect, function(err,client, done){
@@ -39,6 +41,20 @@ app.get('/', function(req, res){
            done();
        });
    });
+});
+
+app.post('/add',function(req,res){
+    //PG Connect
+    pg.connect(connect, function(err,client, done){
+        if(err){
+            return console.error('error fetching client from pool', err);
+        }
+        client.query("INSERT INTO recipe(title,ingredients, directions) VALUES ($1, $2, $3)",
+            [req.body.title, req.body.ingredients, req.body.directions]);
+
+            done();
+            res.redirect('/')
+    });
 });
 pool.end()
 
