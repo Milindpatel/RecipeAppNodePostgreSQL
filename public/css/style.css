@@ -1,4 +1,8 @@
-body{
-    margin-top: 10px;
-    background: #f9f9f9
+body {
+  background: #f9f9f9;
+}
+
+/* Keep the line breaks people type into ingredients and directions. */
+.recipe-text {
+  white-space: pre-line;
 }

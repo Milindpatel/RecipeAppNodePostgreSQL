@@ -1,94 +1,69 @@
-var express = require('express'),
-    path = require('path'),
-    bodyParser = require('body-parser'),
-    cons = require('consolidate'),
-    dust = require('dustjs-helpers'),
-    pg = require('pg'),
-    app = express();
-var pool = new pg.Pool()
+const path = require('node:path');
+const express = require('express');
+const { recipeRepo } = require('./db/recipes');
 
-//DB Connect string
-var connect = "postgres://milind:12345@localhost/recipebookdb";
+/** Trimmed recipe fields from a form, or an error message. */
+function readRecipe(body = {}) {
+  const recipe = {
+    title: String(body.title ?? '').trim(),
+    ingredients: String(body.ingredients ?? '').trim(),
+    directions: String(body.directions ?? '').trim(),
+  };
+  if (!recipe.title || !recipe.ingredients || !recipe.directions) return { error: 'Please fill in every field.' };
+  if (recipe.title.length > 200) return { error: 'The recipe name is too long (200 characters max).' };
+  return { recipe };
+}
 
-//Assign dust engine to .dust files
-app.engine('dust', cons.dust);
+/** Positive integer id, or null. */
+function readId(value) {
+  const id = Number(value);
+  return Number.isInteger(id) && id > 0 && id <= 2147483647 ? id : null;
+}
 
-//set default Ext .dust
-app.set('view engine', 'dust');
-app.set('views', __dirname + '/views');
+function createApp(db) {
+  const recipes = recipeRepo(db);
+  const app = express();
+  app.disable('x-powered-by');
+  app.set('view engine', 'ejs');
+  app.set('views', path.join(__dirname, 'views'));
 
-//set public folder
-app.use(express.static(path.join(__dirname,'public')));
+  app.use(express.static(path.join(__dirname, 'public')));
+  app.use('/vendor/bootstrap', express.static(path.join(__dirname, 'node_modules', 'bootstrap', 'dist')));
+  app.use(express.urlencoded({ extended: false, limit: '50kb' }));
 
-//Body parser Middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+  app.get('/', async (req, res) => {
+    res.render('index', { recipes: await recipes.all(), error: req.query.error || null });
+  });
 
+  app.post('/add', async (req, res) => {
+    const { recipe, error } = readRecipe(req.body);
+    if (error) return res.redirect(`/?error=${encodeURIComponent(error)}`);
+    await recipes.add(recipe);
+    return res.redirect('/');
+  });
 
-//*******USE npm install pg@6************** 
-app.get('/', function(req, res){
-   //PG connect
-   pg.connect(connect, function(err,client, done){
-       if(err){
-           return console.error('error fetching client from pool', err);
-       }
-       client.query('SELECT * FROM recipe', function(err, result){
-           if(err){
-               return console.error('error running query', err);
-           }
-           console.log(result.rows)
-           res.render('index', {recipes: result.rows});// it is used for dust files
-           done();
-       });
-   });
-});
+  app.post('/edit', async (req, res) => {
+    const id = readId(req.body.id);
+    const { recipe, error } = readRecipe(req.body);
+    if (!id || error) return res.redirect(`/?error=${encodeURIComponent(error || 'Unknown recipe.')}`);
+    if (!(await recipes.update(id, recipe))) return res.redirect(`/?error=${encodeURIComponent('That recipe no longer exists.')}`);
+    return res.redirect('/');
+  });
 
-app.post('/add',function(req,res){
-    //PG Connect
-    pg.connect(connect, function(err,client, done){
-        if(err){
-            return console.error('error fetching client from pool', err);
-        }
-        client.query("INSERT INTO recipe(title,ingredients, directions) VALUES ($1, $2, $3)",
-            [req.body.title, req.body.ingredients, req.body.directions]);
+  app.delete('/delete/:id', async (req, res) => {
+    const id = readId(req.params.id);
+    if (!id || !(await recipes.remove(id))) return res.sendStatus(404);
+    return res.sendStatus(204);
+  });
 
-            done();
-            res.redirect('/')
-    });
-});
+  app.use((req, res) => res.status(404).send('Not found'));
+  // eslint-disable-next-line no-unused-vars
+  app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(500).send('Something went wrong');
+  });
 
-app.delete('/delete/:id', function(req,res){
-    //PG connect
-    pg.connect(connect, function(err,client, done){
-        if(err){
-            return console.error('error fetching client from pool', err);
-        }
-        client.query('DELETE FROM recipe WHERE id = $1',[req.params.id]);
+  return app;
+}
 
-        done();
-        res.send(200);
-            
-        
-    });
-});
-
-app.post('/edit', function(req,res){
-    //PG connect
-    pg.connect(connect, function(err,client, done){
-        if(err){
-            return console.error('error fetching client from pool', err);
-        }
-        client.query('UPDATE recipe SET title=$1, ingredients=$2, directions=$3 WHERE id= $4',[req.body.title, req.body.ingredients ,req.body.directions, req.body.id]);
-
-        done();
-        res.redirect('/');
-            
-        
-    });
-});
-pool.end()
-
-//server
-app.listen(3000, function(){
-    console.log('Server started On prot 3000');
-});
+module.exports = { createApp, recipeRepo };

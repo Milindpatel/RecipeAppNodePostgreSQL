@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS recipe (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(200) NOT NULL,
+  ingredients TEXT NOT NULL,
+  directions TEXT NOT NULL
+);

@@ -1,29 +1,31 @@
 {
   "name": "recipebook",
-  "version": "1.0.0",
-  "description": "Recipe Manager",
-  "main": "app.js",
+  "version": "2.0.0",
+  "description": "Recipe manager: add, edit and delete recipes stored in PostgreSQL",
+  "private": true,
+  "main": "server.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "test": "vitest run"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Milindpatel/RecipeAppNodePostgreSQL.git"
   },
-  "author": "Milind patel Test",
+  "author": "Milind Patel",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Milindpatel/RecipeAppNodePostgreSQL/issues"
-  },
-  "homepage": "https://github.com/Milindpatel/RecipeAppNodePostgreSQL#readme",
   "dependencies": {
-    "body-parser": "*",
-    "consolidate": "*",
-    "dust": "*",
-    "dustjs-helpers": "*",
-    "dustjs-linkedin": "*",
-    "express": "*",
-    "pg": "*"
+    "bootstrap": "^5.3.8",
+    "ejs": "^7.0.2",
+    "express": "^5.3.0",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "pg-mem": "^3.0.14",
+    "supertest": "^7.3.1",
+    "vitest": "^5.0.5"
   }
-
 }

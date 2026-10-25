@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RecipeBook</title>
+  <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main class="container" style="max-width: 760px">
+    <h1 class="h3 my-3">RecipeBook</h1>
+
+    <% if (error) { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+
+    <button type="button" class="btn btn-primary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#addModal">
+      Add Recipe
+    </button>
+
+    <% if (!recipes.length) { %>
+      <p class="text-body-secondary text-center">No recipes yet. Add your first one!</p>
+    <% } %>
+
+    <div class="accordion" id="recipes">
+      <% for (const r of recipes) { %>
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#recipe-<%= r.id %>"
+                    aria-expanded="false" aria-controls="recipe-<%= r.id %>">
+              <%= r.title %>
+            </button>
+          </h2>
+          <div id="recipe-<%= r.id %>" class="accordion-collapse collapse" data-bs-parent="#recipes">
+            <div class="accordion-body">
+              <p><strong>Ingredients:</strong></p>
+              <p class="recipe-text"><%= r.ingredients %></p>
+              <p><strong>Directions:</strong></p>
+              <p class="recipe-text"><%= r.directions %></p>
+              <hr>
+              <button type="button" class="btn btn-outline-secondary btn-sm edit-recipe" data-bs-toggle="modal" data-bs-target="#editModal"
+                      data-id="<%= r.id %>" data-title="<%= r.title %>" data-ingredients="<%= r.ingredients %>" data-directions="<%= r.directions %>">
+                Edit
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm delete-recipe" data-id="<%= r.id %>" data-title="<%= r.title %>">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <%- include('recipe-modal', { id: 'addModal', heading: 'Add Recipe', action: '/add' }) %>
+  <%- include('recipe-modal', { id: 'editModal', heading: 'Edit Recipe', action: '/edit' }) %>
+
+  <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>
